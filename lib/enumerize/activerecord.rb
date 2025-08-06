@@ -127,17 +127,10 @@ module Enumerize
         if value.is_a?(::Enumerize::Value)
           value
         else
-          # First try to find the enumerize value directly
           enumerize_value = @attr.find_value(value)
-          
-          if enumerize_value
-            # If found, return the Enumerize::Value object
-            enumerize_value
-          else
-            # If not found, delegate to subtype then try to find value
-            casted = @subtype.cast(value)
-            @attr.find_value(casted)
-          end
+          return enumerize_value if enumerize_value
+
+          @attr.find_value(@subtype.cast(value))
         end
       end
 
