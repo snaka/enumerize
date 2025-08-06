@@ -823,7 +823,7 @@ class ActiveRecordTest < Minitest::Spec
     User.delete_all
 
     User.insert_all([
-      { sex: :invalid_sex, status: :invalid_status }
+      { sex: :invalid_sex, status: 999 }  # Use invalid integer for status
     ])
 
     user = User.first
