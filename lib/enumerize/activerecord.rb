@@ -127,9 +127,6 @@ module Enumerize
         if value.is_a?(::Enumerize::Value)
           value
         else
-          enumerize_value = @attr.find_value(value)
-          return enumerize_value if enumerize_value
-
           @attr.find_value(@subtype.cast(value))
         end
       end
