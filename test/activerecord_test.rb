@@ -876,5 +876,47 @@ class ActiveRecordTest < Minitest::Spec
       user = User.new(locale: ' DE ')
       expect(user.locale).must_equal 'de'
     end
+
+    it 'supports AR#normalizes with insert_all' do
+      User.delete_all
+      User.insert_all([{ locale: ' DE ' }, { locale: ' EN ' }])
+
+      expect(User.exists?(locale: 'de')).must_equal true
+      expect(User.exists?(locale: 'en')).must_equal true
+      expect(User.where(locale: 'de').count).must_equal 1
+      expect(User.where(locale: 'en').count).must_equal 1
+    end
+
+    it 'supports AR#normalizes with upsert_all' do
+      User.delete_all
+      User.upsert_all([{ locale: ' DE ' }, { locale: ' EN ' }])
+
+      expect(User.exists?(locale: 'de')).must_equal true
+      expect(User.exists?(locale: 'en')).must_equal true
+      expect(User.where(locale: 'de').count).must_equal 1
+      expect(User.where(locale: 'en').count).must_equal 1
+    end
+
+    it 'normalizes empty strings to nil with insert_all' do
+      User.delete_all
+      User.insert_all([{ locale: '' }, { locale: '   ' }])
+
+      # Check that empty strings are normalized to nil at the database level
+      users = User.all.to_a
+      expect(users.length).must_equal 2
+      expect(users.all? { |u| u.locale.nil? }).must_equal true
+      expect(users.all? { |u| u.read_attribute(:locale).nil? }).must_equal true
+    end
+
+    it 'normalizes empty strings to nil with upsert_all' do
+      User.delete_all
+      User.upsert_all([{ locale: '' }, { locale: '   ' }])
+
+      # Check that empty strings are normalized to nil at the database level
+      users = User.all.to_a
+      expect(users.length).must_equal 2
+      expect(users.all? { |u| u.locale.nil? }).must_equal true
+      expect(users.all? { |u| u.read_attribute(:locale).nil? }).must_equal true
+    end
   end
 end
