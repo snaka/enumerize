@@ -108,6 +108,11 @@ module Enumerize
           allowed_value_or_nil = self.class.enumerized_attributes[:#{name}].find_value(new_value)
           allowed_value_or_nil = allowed_value_or_nil.value unless allowed_value_or_nil.nil?
 
+          # For ActiveRecord, pass through invalid values to enable normalizes method integration
+          if allowed_value_or_nil.nil? && defined?(::ActiveRecord::Base) && self.is_a?(::ActiveRecord::Base)
+            allowed_value_or_nil = new_value
+          end
+
           if defined?(super)
             super allowed_value_or_nil
           elsif respond_to?(:write_attribute, true)
